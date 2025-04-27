@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 function AddEntry() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default today
@@ -22,9 +23,32 @@ function AddEntry() {
 
   const { netWeight, netAmount, commission, bardanMarket, tolai, total } = calculateFields();
 
-  const handleSave = () => {
-    // Handle save logic here
-    alert("Entry saved!");
+  const handleSave = async () => {
+    const newTransaction = {
+      date,
+      party,
+      rate,
+      bag,
+      grossWeight,
+      kapatPerBag,
+      kapat: kapatPerBag * bag,
+      netWeight,
+      netAmount,
+      commission,
+      bardanMarket,
+      tolai,
+      total,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/transactions/add", newTransaction);
+      if (response.status === 201) {
+        alert("Entry saved successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving entry:", error);
+      alert("Error saving entry!");
+    }
   };
 
   return (
