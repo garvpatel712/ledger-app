@@ -74,4 +74,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE: Delete transaction
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedTransaction = await Transaction.findByIdAndDelete(req.params.id);
+    if (!deletedTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+    res.json({ message: 'Transaction deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 export default router;

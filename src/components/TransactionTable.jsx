@@ -56,6 +56,19 @@ function TransactionTable() {
     setFilteredTransactions(filtered);
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this transaction?")) {
+      try {
+        await axios.delete(`http://localhost:5000/api/transactions/${id}`);
+        // Refresh the transactions list
+        fetchTransactions();
+      } catch (err) {
+        console.error("Error deleting transaction:", err);
+        alert("Failed to delete transaction");
+      }
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
   }
@@ -164,13 +177,19 @@ function TransactionTable() {
                   <td className="px-6 py-4 whitespace-nowrap font-semibold">
                     {transaction.total}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap space-x-2">
                     <Link
                       to={`/edit/${transaction._id}`}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       Edit
                     </Link>
+                    <button
+                      onClick={() => handleDelete(transaction._id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
