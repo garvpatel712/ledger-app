@@ -44,4 +44,34 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET: Get single transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+    res.json(transaction);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// PUT: Update transaction
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+    res.json(updatedTransaction);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 export default router;
