@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import axios from "../utils/axios";
+import { Link, useNavigate } from "react-router-dom";
 
 function TransactionTable() {
   const [transactions, setTransactions] = useState([]);
@@ -9,6 +9,7 @@ function TransactionTable() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTransactions();
@@ -20,18 +21,34 @@ function TransactionTable() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/transactions");
-      // Sort by _id in descending order to show latest first
+      setLoading(true);
+      setError(null);
+      console.log('Fetching transactions...');
+      const response = await axios.get("/transactions");
+      console.log('Received transactions:', response.data);
+      
+      // Get current user from localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      // Sort transactions by date (newest first)
       const sortedTransactions = response.data.sort((a, b) => 
-        b._id.localeCompare(a._id)
+        new Date(b.date) - new Date(a.date)
       );
       setTransactions(sortedTransactions);
       setFilteredTransactions(sortedTransactions);
-      setLoading(false);
     } catch (err) {
-      setError("Failed to fetch transactions");
+      console.error('Error fetching transactions:', err);
+      if (err.response?.status === 401) {
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.message || "Failed to fetch transactions");
+      }
+    } finally {
       setLoading(false);
-      console.error("Error fetching transactions:", err);
     }
   };
 
@@ -59,144 +76,139 @@ function TransactionTable() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this transaction?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/transactions/${id}`);
+        await axios.delete(`/transactions/${id}`);
         // Refresh the transactions list
         fetchTransactions();
       } catch (err) {
         console.error("Error deleting transaction:", err);
-        alert("Failed to delete transaction");
+        if (err.response?.status === 401) {
+          navigate('/login');
+        } else {
+          alert("Failed to delete transaction");
+        }
       }
     }
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 py-4">{error}</div>;
+    return (
+      <div className="text-center p-4">
+        <p className="text-red-500">{error}</p>
+        <button
+          onClick={fetchTransactions}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Search and Filter Section */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
-              Search by Party Name
-            </label>
-            <input
-              type="text"
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Enter party name..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-              Filter by Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+    <div className="container mx-auto px-4">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex space-x-4">
+          <input
+            type="text"
+            placeholder="Search by party name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border rounded"
+          />
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="px-4 py-2 border rounded"
+          />
         </div>
+        <Link
+          to="/add-entry"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Add New Entry
+        </Link>
       </div>
 
-      {/* Results Count */}
-      <div className="text-sm text-gray-600">
-        Showing {filteredTransactions.length} of {transactions.length} transactions
-      </div>
-
-      {/* Transactions Table */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+      {filteredTransactions.length === 0 ? (
+        <div className="text-center p-8">
+          <p className="text-gray-500 mb-4">No transactions found</p>
+          <Link
+            to="/add-entry"
+            className="text-blue-500 hover:text-blue-600"
+          >
+            Add your first transaction
+          </Link>
+        </div>
+      ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Party
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rate
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Bags
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Gross Weight
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Net Weight
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Net Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+          <table className="min-w-full bg-white border">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-6 py-3 border-b text-left">Date</th>
+                <th className="px-6 py-3 border-b text-left">Party</th>
+                <th className="px-6 py-3 border-b text-left">Rate</th>
+                <th className="px-6 py-3 border-b text-left">Bags</th>
+                <th className="px-6 py-3 border-b text-left">Gross Weight</th>
+                <th className="px-6 py-3 border-b text-left">Kapat/Bag</th>
+                <th className="px-6 py-3 border-b text-left">Kapat</th>
+                <th className="px-6 py-3 border-b text-left">Net Weight</th>
+                <th className="px-6 py-3 border-b text-left">Net Amount</th>
+                <th className="px-6 py-3 border-b text-left">Commission</th>
+                <th className="px-6 py-3 border-b text-left">Bardan Market</th>
+                <th className="px-6 py-3 border-b text-left">Tolai</th>
+                <th className="px-6 py-3 border-b text-left">Total</th>
+                <th className="px-6 py-3 border-b text-left">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {filteredTransactions.map((transaction) => (
                 <tr key={transaction._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 border-b">
                     {new Date(transaction.date).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.party}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.rate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.bag}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.grossWeight}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.netWeight}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {transaction.netAmount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap font-semibold">
-                    {transaction.total}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                    <Link
-                      to={`/edit/${transaction._id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(transaction._id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-6 py-4 border-b">{transaction.party}</td>
+                  <td className="px-6 py-4 border-b">{transaction.rate}</td>
+                  <td className="px-6 py-4 border-b">{transaction.bag}</td>
+                  <td className="px-6 py-4 border-b">{transaction.grossWeight}</td>
+                  <td className="px-6 py-4 border-b">{transaction.kapatPerBag}</td>
+                  <td className="px-6 py-4 border-b">{transaction.kapat}</td>
+                  <td className="px-6 py-4 border-b">{transaction.netWeight}</td>
+                  <td className="px-6 py-4 border-b">{transaction.netAmount}</td>
+                  <td className="px-6 py-4 border-b">{transaction.commission}</td>
+                  <td className="px-6 py-4 border-b">{transaction.bardanMarket}</td>
+                  <td className="px-6 py-4 border-b">{transaction.tolai}</td>
+                  <td className="px-6 py-4 border-b">{transaction.total}</td>
+                  <td className="px-6 py-4 border-b">
+                    <div className="flex space-x-2">
+                      <Link
+                        to={`/edit-entry/${transaction._id}`}
+                        className="text-blue-500 hover:text-blue-600"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(transaction._id)}
+                        className="text-red-500 hover:text-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      )}
     </div>
   );
 }

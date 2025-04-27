@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../utils/axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 function EditEntry() {
@@ -23,8 +23,41 @@ function EditEntry() {
 
   const fetchTransaction = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/transactions/${id}`);
-      const transaction = response.data;
+      setError(null);
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      console.log('Current user:', user);
+      const response = await axios.get(`/transactions/${id}`);
+      console.log('API Response:', response);
+      
+      const transaction = response?.data;
+      console.log('Transaction object:', transaction);
+
+      if (!transaction) {
+        setError("Transaction not found");
+        setLoading(false);
+        return;
+      }
+
+      // Convert IDs to strings for comparison
+      const currentUserId = user._id?.toString();
+      const transactionUserId = transaction.userId?.toString();
+      
+      console.log('Current user ID:', currentUserId);
+      console.log('Transaction user ID:', transactionUserId);
+
+      // Only check ownership if both IDs exist
+      if (currentUserId && transactionUserId && currentUserId !== transactionUserId) {
+        console.log('Permission denied: IDs do not match');
+        setError("You don't have permission to edit this transaction");
+        setLoading(false);
+        return;
+      }
+
       setFormData({
         date: new Date(transaction.date).toISOString().split('T')[0],
         party: transaction.party,
@@ -35,9 +68,18 @@ function EditEntry() {
       });
       setLoading(false);
     } catch (err) {
-      setError("Failed to fetch transaction");
-      setLoading(false);
       console.error("Error fetching transaction:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      if (err.response?.status === 401) {
+        navigate('/login');
+      } else {
+        setError("Failed to fetch transaction. Please try again.");
+      }
+      setLoading(false);
     }
   };
 
@@ -67,6 +109,7 @@ function EditEntry() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setError(null);
       const updatedTransaction = {
         ...formData,
         kapat,
@@ -78,27 +121,53 @@ function EditEntry() {
         total
       };
 
-      await axios.put(`http://localhost:5000/api/transactions/${id}`, updatedTransaction);
+      await axios.put(`/transactions/${id}`, updatedTransaction);
       alert("Transaction updated successfully!");
       navigate("/");
     } catch (error) {
       console.error("Error updating transaction:", error);
-      alert("Error updating transaction!");
+      if (error.response?.status === 401) {
+        navigate('/login');
+      } else {
+        setError("Failed to update transaction. Please try again.");
+      }
     }
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 py-4">{error}</div>;
+    return (
+      <div className="max-w-4xl mx-auto mt-10 p-6">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+          <button
+            onClick={fetchTransaction}
+            className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6">
       <div className="bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-2xl font-bold text-center mb-6">Edit Transaction</h2>
+        
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-between items-center">
@@ -109,43 +178,42 @@ function EditEntry() {
               value={formData.date}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
             />
           </div>
 
           <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Party Name:</label>
+            <label className="w-1/3 font-semibold">Party:</label>
             <input
               type="text"
               name="party"
               value={formData.party}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
+              placeholder="Enter party name"
             />
           </div>
 
           <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Rate (₹):</label>
+            <label className="w-1/3 font-semibold">Rate:</label>
             <input
               type="number"
               name="rate"
               value={formData.rate}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
+              placeholder="Enter rate"
             />
           </div>
 
           <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Bag (Qty):</label>
+            <label className="w-1/3 font-semibold">Bags:</label>
             <input
               type="number"
               name="bag"
               value={formData.bag}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
+              placeholder="Enter number of bags"
             />
           </div>
 
@@ -157,7 +225,7 @@ function EditEntry() {
               value={formData.grossWeight}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
+              placeholder="Enter gross weight"
             />
           </div>
 
@@ -169,17 +237,7 @@ function EditEntry() {
               value={formData.kapatPerBag}
               onChange={handleChange}
               className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              required
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Kapat:</label>
-            <input
-              type="number"
-              value={kapat}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
+              step="0.01"
             />
           </div>
 
@@ -243,19 +301,19 @@ function EditEntry() {
             />
           </div>
 
-          <div className="flex justify-center space-x-4 mt-6">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Update Entry
-            </button>
+          <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
               onClick={() => navigate("/")}
-              className="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Update
             </button>
           </div>
         </form>
