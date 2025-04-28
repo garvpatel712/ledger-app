@@ -54,7 +54,6 @@ A modern web application for managing transactions with a focus on agricultural 
 
 2. Install frontend dependencies:
    ```bash
-   cd frontend
    npm install
    ```
 
