@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 
+// Helper function to format numbers to 2 decimal places
+const formatNumber = (num) => {
+  return Number(num).toFixed(2);
+};
+
 function AddEntry() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [party, setParty] = useState("");
@@ -29,7 +34,6 @@ function AddEntry() {
         .slice(0, 5);
       setRecentEntries(sortedEntries);
     } catch (error) {
-      console.error("Error fetching entries:", error);
       if (error.response?.status === 401) {
         navigate('/login');
       } else {
@@ -63,10 +67,6 @@ function AddEntry() {
 
   const handleSave = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) {
-      navigate('/login');
-      return;
-    }
 
     const newTransaction = {
       date,
@@ -95,7 +95,6 @@ function AddEntry() {
         fetchRecentEntries(); // Refresh the entries list
       }
     } catch (error) {
-      console.error("Error saving entry:", error);
       if (error.response?.status === 401) {
         navigate('/login');
       } else {
@@ -186,8 +185,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Net Weight:</label>
             <input
-              type="number"
-              value={netWeight}
+              type="text"
+              value={formatNumber(netWeight)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />
@@ -196,8 +195,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Net Amount:</label>
             <input
-              type="number"
-              value={netAmount}
+              type="text"
+              value={formatNumber(netAmount)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />
@@ -206,8 +205,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Commission:</label>
             <input
-              type="number"
-              value={commission}
+              type="text"
+              value={formatNumber(commission)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />
@@ -216,8 +215,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Bardan Market:</label>
             <input
-              type="number"
-              value={bardanMarket}
+              type="text"
+              value={formatNumber(bardanMarket)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />
@@ -226,8 +225,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Tolai:</label>
             <input
-              type="number"
-              value={tolai}
+              type="text"
+              value={formatNumber(tolai)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />
@@ -236,8 +235,8 @@ function AddEntry() {
           <div className="flex justify-between items-center">
             <label className="w-1/3 font-semibold">Total:</label>
             <input
-              type="number"
-              value={total}
+              type="text"
+              value={formatNumber(total)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100 font-bold"
             />
@@ -284,10 +283,10 @@ function AddEntry() {
                   <tr key={entry._id}>
                     <td className="px-4 py-2">{new Date(entry.date).toLocaleDateString()}</td>
                     <td className="px-4 py-2">{entry.party}</td>
-                    <td className="px-4 py-2">{entry.rate}</td>
+                    <td className="px-4 py-2">{formatNumber(entry.rate)}</td>
                     <td className="px-4 py-2">{entry.bag}</td>
-                    <td className="px-4 py-2">{entry.netWeight}</td>
-                    <td className="px-4 py-2">{entry.total}</td>
+                    <td className="px-4 py-2">{formatNumber(entry.netWeight)}</td>
+                    <td className="px-4 py-2">{formatNumber(entry.total)}</td>
                   </tr>
                 ))}
               </tbody>

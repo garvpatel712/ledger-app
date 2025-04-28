@@ -24,7 +24,7 @@ function Signup() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -34,10 +34,17 @@ function Signup() {
     try {
       const { confirmPassword, ...signupData } = formData;
       const response = await axios.post('/auth/signup', signupData);
-      
+
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/dashboard');
+        // Store both user data and token
+        const userData = {
+          ...response.data.user,
+          token: response.data.token // Make sure your backend sends the token
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        // Force a full page reload to ensure all components are updated
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       console.error('Signup error:', err);

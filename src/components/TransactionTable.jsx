@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
 
+// Helper function to format numbers to 2 decimal places
+const formatNumber = (num) => {
+  return Number(num).toFixed(2);
+};
+
 function TransactionTable() {
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
@@ -23,16 +28,7 @@ function TransactionTable() {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching transactions...');
       const response = await axios.get("/transactions");
-      console.log('Received transactions:', response.data);
-      
-      // Get current user from localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user) {
-        navigate('/login');
-        return;
-      }
 
       // Sort transactions by date (newest first)
       const sortedTransactions = response.data.sort((a, b) => 
@@ -131,7 +127,7 @@ function TransactionTable() {
           />
         </div>
         <Link
-          to="/add-entry"
+          to="/add"
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >
           Add New Entry
@@ -142,7 +138,7 @@ function TransactionTable() {
         <div className="text-center p-8">
           <p className="text-gray-500 mb-4">No transactions found</p>
           <Link
-            to="/add-entry"
+            to="/add"
             className="text-blue-500 hover:text-blue-600"
           >
             Add your first transaction
@@ -176,17 +172,17 @@ function TransactionTable() {
                     {new Date(transaction.date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 border-b">{transaction.party}</td>
-                  <td className="px-6 py-4 border-b">{transaction.rate}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.rate)}</td>
                   <td className="px-6 py-4 border-b">{transaction.bag}</td>
-                  <td className="px-6 py-4 border-b">{transaction.grossWeight}</td>
-                  <td className="px-6 py-4 border-b">{transaction.kapatPerBag}</td>
-                  <td className="px-6 py-4 border-b">{transaction.kapat}</td>
-                  <td className="px-6 py-4 border-b">{transaction.netWeight}</td>
-                  <td className="px-6 py-4 border-b">{transaction.netAmount}</td>
-                  <td className="px-6 py-4 border-b">{transaction.commission}</td>
-                  <td className="px-6 py-4 border-b">{transaction.bardanMarket}</td>
-                  <td className="px-6 py-4 border-b">{transaction.tolai}</td>
-                  <td className="px-6 py-4 border-b">{transaction.total}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.grossWeight)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.kapatPerBag)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.kapat)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.netWeight)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.netAmount)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.commission)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.bardanMarket)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.tolai)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.total)}</td>
                   <td className="px-6 py-4 border-b">
                     <div className="flex space-x-2">
                       <Link

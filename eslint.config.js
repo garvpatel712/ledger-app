@@ -1,7 +1,9 @@
-import js from '@eslint/js'
+import { FlatCompat } from '@eslint/eslintrc'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+
+const compat = new FlatCompat()
 
 export default [
   { ignores: ['dist'] },
@@ -21,7 +23,7 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...js.configs.recommended.rules,
+      ...compat.config({ extends: ['eslint:recommended'] }).rules,
       ...reactHooks.configs.recommended.rules,
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'react-refresh/only-export-components': [

@@ -3,8 +3,18 @@ import User from '../models/user.js';
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    
+    // Check for token in cookies
+    let token = req.cookies.token;
+
+    // If no token in cookies, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      // Check if it's a Bearer token
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
     if (!token) {
       return res.status(401).json({ message: 'No token, authorization denied' });
     }

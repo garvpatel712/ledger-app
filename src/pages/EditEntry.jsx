@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { useParams, useNavigate } from "react-router-dom";
 
+// Helper function to format numbers to 2 decimal places
+const formatNumber = (num) => {
+  return Number(num).toFixed(2);
+};
+
 function EditEntry() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -25,17 +30,9 @@ function EditEntry() {
     try {
       setError(null);
       const user = JSON.parse(localStorage.getItem('user'));
-      if (!user) {
-        navigate('/login');
-        return;
-      }
 
-      console.log('Current user:', user);
       const response = await axios.get(`/transactions/${id}`);
-      console.log('API Response:', response);
-      
       const transaction = response?.data;
-      console.log('Transaction object:', transaction);
 
       if (!transaction) {
         setError("Transaction not found");
@@ -46,13 +43,9 @@ function EditEntry() {
       // Convert IDs to strings for comparison
       const currentUserId = user._id?.toString();
       const transactionUserId = transaction.userId?.toString();
-      
-      console.log('Current user ID:', currentUserId);
-      console.log('Transaction user ID:', transactionUserId);
 
       // Only check ownership if both IDs exist
       if (currentUserId && transactionUserId && currentUserId !== transactionUserId) {
-        console.log('Permission denied: IDs do not match');
         setError("You don't have permission to edit this transaction");
         setLoading(false);
         return;
@@ -123,7 +116,7 @@ function EditEntry() {
 
       await axios.put(`/transactions/${id}`, updatedTransaction);
       alert("Transaction updated successfully!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error updating transaction:", error);
       if (error.response?.status === 401) {
@@ -162,7 +155,7 @@ function EditEntry() {
     <div className="max-w-4xl mx-auto mt-10 p-6">
       <div className="bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-2xl font-bold text-center mb-6">Edit Transaction</h2>
-        
+
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             <span className="block sm:inline">{error}</span>
@@ -304,7 +297,7 @@ function EditEntry() {
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/dashboard")}
               className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Cancel
