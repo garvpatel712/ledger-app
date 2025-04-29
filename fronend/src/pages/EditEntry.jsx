@@ -154,9 +154,9 @@ function EditEntry() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6">
-      <div className="bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-center mb-6">Edit Transaction</h2>
+    <div className="max-w-4xl mx-auto mt-4 md:mt-10 p-4 md:p-6">
+      <div className="bg-white shadow-lg rounded-lg p-4 md:p-6">
+        <h2 className="text-xl md:text-2xl font-bold text-center mb-6">Edit Transaction</h2>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -165,158 +165,169 @@ function EditEntry() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Date:</label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date:</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Party:</label>
+                <input
+                  type="text"
+                  name="party"
+                  value={formData.party}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter party name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rate:</label>
+                <input
+                  type="number"
+                  name="rate"
+                  value={formData.rate}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter rate"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bags:</label>
+                <input
+                  type="number"
+                  name="bag"
+                  value={formData.bag}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter number of bags"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Gross Weight:</label>
+                <input
+                  type="number"
+                  name="grossWeight"
+                  value={formData.grossWeight}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter gross weight"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kapat per Bag:</label>
+                <input
+                  type="number"
+                  name="kapatPerBag"
+                  value={formData.kapatPerBag}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  step="0.01"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Party:</label>
-            <input
-              type="text"
-              name="party"
-              value={formData.party}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              placeholder="Enter party name"
-            />
+          <div className="border-t border-gray-200 mt-6 pt-6">
+            <h3 className="text-lg font-semibold mb-4">Calculated Values</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Net Weight:</label>
+                <input
+                  type="text"
+                  value={netWeight}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Net Amount:</label>
+                <input
+                  type="text"
+                  value={netAmount}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Commission:</label>
+                <input
+                  type="text"
+                  value={commission}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bardan Market:</label>
+                <input
+                  type="text"
+                  value={bardanMarket}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tolai:</label>
+                <input
+                  type="text"
+                  value={tolai}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Market Fee:</label>
+                <input
+                  type="text"
+                  value={marketFee}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Total:</label>
+              <input
+                type="text"
+                value={total}
+                readOnly
+                className="w-full px-4 py-2 border border-gray-300 rounded bg-gray-50 font-bold text-lg"
+              />
+            </div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Rate:</label>
-            <input
-              type="number"
-              name="rate"
-              value={formData.rate}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              placeholder="Enter rate"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Bags:</label>
-            <input
-              type="number"
-              name="bag"
-              value={formData.bag}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              placeholder="Enter number of bags"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Gross Weight:</label>
-            <input
-              type="number"
-              name="grossWeight"
-              value={formData.grossWeight}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              placeholder="Enter gross weight"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Kapat per Bag:</label>
-            <input
-              type="number"
-              name="kapatPerBag"
-              value={formData.kapatPerBag}
-              onChange={handleChange}
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded"
-              step="0.01"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Net Weight:</label>
-            <input
-              type="number"
-              value={netWeight}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Net Amount:</label>
-            <input
-              type="number"
-              value={netAmount}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Commission:</label>
-            <input
-              type="number"
-              value={commission}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Bardan Market:</label>
-            <input
-              type="number"
-              value={bardanMarket}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Tolai:</label>
-            <input
-              type="number"
-              value={tolai}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Market Fee:</label>
-            <input
-              type="number"
-              value={marketFee}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <label className="w-1/3 font-semibold">Total:</label>
-            <input
-              type="number"
-              value={total}
-              readOnly
-              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100 font-bold"
-            />
-          </div>
-
-          <div className="flex justify-end space-x-4 mt-6">
+          <div className="flex flex-col md:flex-row justify-end space-y-3 md:space-y-0 md:space-x-4 mt-6">
             <button
               type="button"
               onClick={() => navigate("/dashboard")}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full md:w-auto"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full md:w-auto"
             >
               Update
             </button>

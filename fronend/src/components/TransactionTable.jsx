@@ -109,33 +109,33 @@ function TransactionTable() {
   }
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-4">
+    <div className="container mx-auto px-2 md:px-4">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 space-y-4 md:space-y-0">
+        <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
           <input
             type="text"
             placeholder="Search by party name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded w-full md:w-auto"
           />
           <input
             type="date"
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded w-full md:w-auto"
           />
         </div>
         <Link
           to="/add"
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
         >
           Add New Entry
         </Link>
       </div>
 
       {filteredTransactions.length === 0 ? (
-        <div className="text-center p-8">
+        <div className="text-center p-4 md:p-8">
           <p className="text-gray-500 mb-4">No transactions found</p>
           <Link
             to="/add"
@@ -145,66 +145,62 @@ function TransactionTable() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-6 py-3 border-b text-left">Date</th>
-                <th className="px-6 py-3 border-b text-left">Party</th>
-                <th className="px-6 py-3 border-b text-left">Rate</th>
-                <th className="px-6 py-3 border-b text-left">Bags</th>
-                <th className="px-6 py-3 border-b text-left">Gross Weight</th>
-                <th className="px-6 py-3 border-b text-left">Kapat/Bag</th>
-                <th className="px-6 py-3 border-b text-left">Kapat</th>
-                <th className="px-6 py-3 border-b text-left">Net Weight</th>
-                <th className="px-6 py-3 border-b text-left">Net Amount</th>
-                <th className="px-6 py-3 border-b text-left">Commission</th>
-                <th className="px-6 py-3 border-b text-left">Bardan Market</th>
-                <th className="px-6 py-3 border-b text-left">Tolai</th>
-                <th className="px-6 py-3 border-b text-left">Market Fee</th>
-                <th className="px-6 py-3 border-b text-left">Total</th>
-                <th className="px-6 py-3 border-b text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.map((transaction) => (
-                <tr key={transaction._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 border-b">
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 border-b">{transaction.party}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.rate)}</td>
-                  <td className="px-6 py-4 border-b">{transaction.bag}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.grossWeight)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.kapatPerBag)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.kapat)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.netWeight)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.netAmount)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.commission)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.bardanMarket)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.tolai)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.marketFee)}</td>
-                  <td className="px-6 py-4 border-b">{formatNumber(transaction.total)}</td>
-                  <td className="px-6 py-4 border-b">
-                    <div className="flex space-x-2">
-                      <Link
-                        to={`/edit-entry/${transaction._id}`}
-                        className="text-blue-500 hover:text-blue-600"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(transaction._id)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <div className="inline-block min-w-full align-middle">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Date</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Party</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Rate</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Bags</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Net Weight</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Total</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredTransactions.map((transaction) => (
+                  <tr key={transaction._id} className="hover:bg-gray-50">
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {transaction.party}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.rate)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {transaction.bag}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.netWeight)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.total)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm whitespace-nowrap">
+                      <div className="flex space-x-3">
+                        <Link
+                          to={`/edit-entry/${transaction._id}`}
+                          className="text-blue-500 hover:text-blue-600"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(transaction._id)}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
