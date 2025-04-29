@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/add', auth, async (req, res) => {
   const {
     date, party, rate, bag, grossWeight, kapatPerBag,
-    kapat, netWeight, netAmount, commission, bardanMarket, tolai, total
+    kapat, netWeight, netAmount, commission, bardanMarket, tolai, marketFee, total
   } = req.body;
 
   try {
@@ -25,6 +25,7 @@ router.post('/add', auth, async (req, res) => {
       commission,
       bardanMarket,
       tolai,
+      marketFee,
       total,
       userId: req.user._id
     });

@@ -49,6 +49,10 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  marketFee: {
+    type: Number,
+    required: true
+  },
   total: {
     type: Number,
     required: true

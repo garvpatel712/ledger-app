@@ -48,13 +48,14 @@ function AddEntry() {
     const netAmount = rate * (netWeight / 20);
     const commission = netAmount * (1.25 / 100);
     const bardanMarket = bag * 15;
-    const tolai = bag * 5;
-    const total = netAmount + commission + bardanMarket + tolai;
+    const tolai = bag * 2;
+    const marketFee = bag * 3;
+    const total = netAmount + commission + bardanMarket + tolai + marketFee;
 
-    return { netWeight, netAmount, commission, bardanMarket, tolai, total };
+    return { netWeight, netAmount, commission, bardanMarket, tolai, marketFee, total };
   };
 
-  const { netWeight, netAmount, commission, bardanMarket, tolai, total } = calculateFields();
+  const { netWeight, netAmount, commission, bardanMarket, tolai, marketFee, total } = calculateFields();
 
   const clearForm = () => {
     setDate(new Date().toISOString().split('T')[0]);
@@ -81,6 +82,7 @@ function AddEntry() {
       commission,
       bardanMarket,
       tolai,
+      marketFee,
       total,
       userId: user._id
     };
@@ -227,6 +229,16 @@ function AddEntry() {
             <input
               type="text"
               value={formatNumber(tolai)}
+              readOnly
+              className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
+            />
+          </div>
+
+          <div className="flex justify-between items-center">
+            <label className="w-1/3 font-semibold">Market Fee:</label>
+            <input
+              type="text"
+              value={formatNumber(marketFee)}
               readOnly
               className="w-2/3 px-4 py-2 border border-gray-300 rounded bg-gray-100"
             />

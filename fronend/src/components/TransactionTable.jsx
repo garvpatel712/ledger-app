@@ -161,6 +161,7 @@ function TransactionTable() {
                 <th className="px-6 py-3 border-b text-left">Commission</th>
                 <th className="px-6 py-3 border-b text-left">Bardan Market</th>
                 <th className="px-6 py-3 border-b text-left">Tolai</th>
+                <th className="px-6 py-3 border-b text-left">Market Fee</th>
                 <th className="px-6 py-3 border-b text-left">Total</th>
                 <th className="px-6 py-3 border-b text-left">Actions</th>
               </tr>
@@ -182,6 +183,7 @@ function TransactionTable() {
                   <td className="px-6 py-4 border-b">{formatNumber(transaction.commission)}</td>
                   <td className="px-6 py-4 border-b">{formatNumber(transaction.bardanMarket)}</td>
                   <td className="px-6 py-4 border-b">{formatNumber(transaction.tolai)}</td>
+                  <td className="px-6 py-4 border-b">{formatNumber(transaction.marketFee)}</td>
                   <td className="px-6 py-4 border-b">{formatNumber(transaction.total)}</td>
                   <td className="px-6 py-4 border-b">
                     <div className="flex space-x-2">
