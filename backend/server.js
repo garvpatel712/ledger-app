@@ -28,18 +28,14 @@ app.use('/api/transactions', auth, transactionRoutes);
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  console.error('MONGODB_URI is not defined in .env file');
   process.exit(1);
 }
 
-console.log('Connecting to MongoDB Atlas...');
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB Atlas successfully');
   })
   .catch((err) => {
-    console.error('MongoDB connection error:', err);
     process.exit(1);
   });
 
@@ -54,7 +50,4 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+app.listen(PORT);
