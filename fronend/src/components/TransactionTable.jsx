@@ -16,6 +16,7 @@ function TransactionTable() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -89,61 +90,87 @@ function TransactionTable() {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(18);
-    doc.text('Transactions Report', 14, 20);
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    try {
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(18);
+      doc.text('Transactions Report', 14, 20);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
 
-    // Define the columns for the table - now including all fields
-    const columns = [
-      { header: 'Date', dataKey: 'date' },
-      { header: 'Party', dataKey: 'party' },
-      { header: 'Rate', dataKey: 'rate' },
-      { header: 'Bags', dataKey: 'bag' },
-      { header: 'Gross Weight', dataKey: 'grossWeight' },
-      { header: 'Kapat/Bag', dataKey: 'kapatPerBag' },
-      { header: 'Kapat', dataKey: 'kapat' },
-      { header: 'Net Weight', dataKey: 'netWeight' },
-      { header: 'Net Amount', dataKey: 'netAmount' },
-      { header: 'Commission', dataKey: 'commission' },
-      { header: 'Bardan Market', dataKey: 'bardanMarket' },
-      { header: 'Tolai', dataKey: 'tolai' },
-      { header: 'Market Fee', dataKey: 'marketFee' },
-      { header: 'Total', dataKey: 'total' }
-    ];
+      // Define the columns for the table - now including all fields
+      const columns = [
+        { header: 'Date', dataKey: 'date' },
+        { header: 'Party', dataKey: 'party' },
+        { header: 'Rate', dataKey: 'rate' },
+        { header: 'Bags', dataKey: 'bag' },
+        { header: 'Gross Weight', dataKey: 'grossWeight' },
+        { header: 'Kapat/Bag', dataKey: 'kapatPerBag' },
+        { header: 'Kapat', dataKey: 'kapat' },
+        { header: 'Net Weight', dataKey: 'netWeight' },
+        { header: 'Net Amount', dataKey: 'netAmount' },
+        { header: 'Commission', dataKey: 'commission' },
+        { header: 'Bardan Market', dataKey: 'bardanMarket' },
+        { header: 'Tolai', dataKey: 'tolai' },
+        { header: 'Market Fee', dataKey: 'marketFee' },
+        { header: 'Total', dataKey: 'total' }
+      ];
 
-    // Prepare the data with all fields
-    const data = filteredTransactions.map(transaction => ({
-      date: new Date(transaction.date).toLocaleDateString(),
-      party: transaction.party,
-      rate: formatNumber(transaction.rate),
-      bag: transaction.bag,
-      grossWeight: formatNumber(transaction.grossWeight),
-      kapatPerBag: formatNumber(transaction.kapatPerBag),
-      kapat: formatNumber(transaction.kapat),
-      netWeight: formatNumber(transaction.netWeight),
-      netAmount: formatNumber(transaction.netAmount),
-      commission: formatNumber(transaction.commission),
-      bardanMarket: formatNumber(transaction.bardanMarket),
-      tolai: formatNumber(transaction.tolai),
-      marketFee: formatNumber(transaction.marketFee),
-      total: formatNumber(transaction.total)
-    }));
+      // Prepare the data with all fields
+      const data = filteredTransactions.map(transaction => ({
+        date: new Date(transaction.date).toLocaleDateString(),
+        party: transaction.party,
+        rate: formatNumber(transaction.rate),
+        bag: transaction.bag,
+        grossWeight: formatNumber(transaction.grossWeight),
+        kapatPerBag: formatNumber(transaction.kapatPerBag),
+        kapat: formatNumber(transaction.kapat),
+        netWeight: formatNumber(transaction.netWeight),
+        netAmount: formatNumber(transaction.netAmount),
+        commission: formatNumber(transaction.commission),
+        bardanMarket: formatNumber(transaction.bardanMarket),
+        tolai: formatNumber(transaction.tolai),
+        marketFee: formatNumber(transaction.marketFee),
+        total: formatNumber(transaction.total)
+      }));
 
-    // Generate the table
-    autoTable(doc, {
-      head: [columns.map(col => col.header)],
-      body: data.map(row => columns.map(col => row[col.dataKey])),
-      startY: 40,
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [66, 139, 202] }
-    });
+      // Generate the table
+      autoTable(doc, {
+        head: [columns.map(col => col.header)],
+        body: data.map(row => columns.map(col => row[col.dataKey])),
+        startY: 40,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [66, 139, 202] }
+      });
 
-    // Save the PDF
-    doc.save('transactions-report.pdf');
+      // Save the PDF
+      doc.save('transactions-report.pdf');
+
+      // Show success notification
+      setNotification({
+        type: 'success',
+        message: 'PDF exported successfully!'
+      });
+
+      // Clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      // Show error notification
+      setNotification({
+        type: 'error',
+        message: 'Failed to export PDF. Please try again.'
+      });
+
+      // Clear notification after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    }
   };
 
   if (loading) {
@@ -201,6 +228,12 @@ function TransactionTable() {
           </Link>
         </div>
       </div>
+
+      {notification && (
+        <div className={`p-4 mb-4 text-sm rounded ${notification.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {notification.message}
+        </div>
+      )}
 
       {filteredTransactions.length === 0 ? (
         <div className="text-center p-4 md:p-8">
