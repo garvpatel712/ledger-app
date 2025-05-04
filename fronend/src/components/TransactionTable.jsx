@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Helper function to format numbers to 2 decimal places
 const formatNumber = (num) => {
@@ -86,6 +88,64 @@ function TransactionTable() {
     }
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Transactions Report', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    // Define the columns for the table - now including all fields
+    const columns = [
+      { header: 'Date', dataKey: 'date' },
+      { header: 'Party', dataKey: 'party' },
+      { header: 'Rate', dataKey: 'rate' },
+      { header: 'Bags', dataKey: 'bag' },
+      { header: 'Gross Weight', dataKey: 'grossWeight' },
+      { header: 'Kapat/Bag', dataKey: 'kapatPerBag' },
+      { header: 'Kapat', dataKey: 'kapat' },
+      { header: 'Net Weight', dataKey: 'netWeight' },
+      { header: 'Net Amount', dataKey: 'netAmount' },
+      { header: 'Commission', dataKey: 'commission' },
+      { header: 'Bardan Market', dataKey: 'bardanMarket' },
+      { header: 'Tolai', dataKey: 'tolai' },
+      { header: 'Market Fee', dataKey: 'marketFee' },
+      { header: 'Total', dataKey: 'total' }
+    ];
+
+    // Prepare the data with all fields
+    const data = filteredTransactions.map(transaction => ({
+      date: new Date(transaction.date).toLocaleDateString(),
+      party: transaction.party,
+      rate: formatNumber(transaction.rate),
+      bag: transaction.bag,
+      grossWeight: formatNumber(transaction.grossWeight),
+      kapatPerBag: formatNumber(transaction.kapatPerBag),
+      kapat: formatNumber(transaction.kapat),
+      netWeight: formatNumber(transaction.netWeight),
+      netAmount: formatNumber(transaction.netAmount),
+      commission: formatNumber(transaction.commission),
+      bardanMarket: formatNumber(transaction.bardanMarket),
+      tolai: formatNumber(transaction.tolai),
+      marketFee: formatNumber(transaction.marketFee),
+      total: formatNumber(transaction.total)
+    }));
+
+    // Generate the table
+    autoTable(doc, {
+      head: [columns.map(col => col.header)],
+      body: data.map(row => columns.map(col => row[col.dataKey])),
+      startY: 40,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [66, 139, 202] }
+    });
+
+    // Save the PDF
+    doc.save('transactions-report.pdf');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -126,12 +186,20 @@ function TransactionTable() {
             className="px-4 py-2 border rounded w-full md:w-auto"
           />
         </div>
-        <Link
-          to="/add"
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
-        >
-          Add New Entry
-        </Link>
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+          <button
+            onClick={exportToPDF}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center"
+          >
+            Export PDF
+          </button>
+          <Link
+            to="/add"
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 text-center"
+          >
+            Add New Entry
+          </Link>
+        </div>
       </div>
 
       {filteredTransactions.length === 0 ? (
@@ -154,7 +222,15 @@ function TransactionTable() {
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Party</th>
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Rate</th>
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Bags</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Gross Weight</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Kapat/Bag</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Kapat</th>
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Net Weight</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Net Amount</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Commission</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Bardan Market</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Tolai</th>
+                  <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Market Fee</th>
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Total</th>
                   <th className="px-3 md:px-6 py-3 text-left text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
                 </tr>
@@ -175,7 +251,31 @@ function TransactionTable() {
                       {transaction.bag}
                     </td>
                     <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.grossWeight)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.kapatPerBag)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.kapat)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
                       {formatNumber(transaction.netWeight)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.netAmount)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.commission)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.bardanMarket)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.tolai)}
+                    </td>
+                    <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                      {formatNumber(transaction.marketFee)}
                     </td>
                     <td className="px-3 md:px-6 py-2 md:py-4 text-xs md:text-sm text-gray-900 whitespace-nowrap">
                       {formatNumber(transaction.total)}

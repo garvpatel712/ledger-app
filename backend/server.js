@@ -14,8 +14,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'https://ledger-app-frontend.onrender.com', // Your frontend URL
-  credentials: true
+  origin: 'https://ledger-app-frontend.onrender.com', // Removed trailing slash
+  credentials: true,
+  // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow methods
+  // allowedHeaders: ['Content-Type', 'Authorization'] // Explicitly allow headers
 }));
 app.use(express.json());
 app.use(cookieParser());
